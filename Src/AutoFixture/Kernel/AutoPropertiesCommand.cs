@@ -252,6 +252,8 @@ namespace Ploeh.AutoFixture.Kernel
 
             foreach (var pi in this.GetProperties(specimen))
             {
+                if (pi.PropertyType.IsInterface && pi.GetValue(specimen, null) != null)
+                    continue;
                 var propertyValue = context.Resolve(pi);
                 if (!(propertyValue is OmitSpecimen))
                     pi.SetValue(specimen, propertyValue, null);
@@ -259,6 +261,8 @@ namespace Ploeh.AutoFixture.Kernel
 
             foreach (var fi in this.GetFields(specimen))
             {
+                if (fi.FieldType.IsInterface && fi.GetValue(specimen) != null)
+                    continue;
                 var fieldValue = context.Resolve(fi);
                 if (!(fieldValue is OmitSpecimen))
                     fi.SetValue(specimen, fieldValue);

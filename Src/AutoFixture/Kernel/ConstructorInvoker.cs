@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Kernel;
 
 namespace Ploeh.AutoFixture.Kernel
 {
@@ -70,6 +71,7 @@ namespace Ploeh.AutoFixture.Kernel
                 if (paramValues.All(ConstructorInvoker.IsValueValid))
                 {
                     return ci.Invoke(paramValues.ToArray());
+                    //return ObjectFactory.Get<object>(paramValues.ToArray());
                 }
             }
 

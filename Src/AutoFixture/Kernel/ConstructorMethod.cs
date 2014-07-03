@@ -110,6 +110,8 @@ This will cause AutoFixture to create an instance of TestDouble every time Abstr
                                 );
 
             }
+
+
             return this.constructor.Invoke(parameters.ToArray());
         }
 

@@ -1,6 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using AutoFixtureTests.Generator.Interfaces;
+using AutoFixtureTests.Utilities;
+using Core.Kernel;
+using Ninject.Parameters;
 
 namespace Ploeh.AutoFixture.Kernel
 {
@@ -63,13 +68,33 @@ namespace Ploeh.AutoFixture.Kernel
 
             foreach (var ci in this.GetConstructors(request))
             {
+                
+                //var paramValues = (from pi in ci.Parameters
+                //                   select context.Resolve(pi)).ToList();
+
                 var paramValues = (from pi in ci.Parameters
-                                   select context.Resolve(pi)).ToList();
+                                   select GetDefaultValue(pi)).ToList(); // solve workbookProtocolManager bug
 
                 if (paramValues.All(MethodInvoker.IsValueValid))
                 {
-                    return ci.Invoke(paramValues.ToArray());
+                    // begin my new code
+                    object result;
+                    if (!MyFactory.TryGet(request, ci.Parameters.ToList(), paramValues, out result))
+                        result = ci.Invoke(paramValues.ToArray());
+
+                    return result;
+                    // target -> return ObjectFactory.Get<T>(arguments);
+                    // end   my new code
+
+                    //return ci.Invoke(paramValues.ToArray());
                 }
+            }
+
+            if (request is Type && ((Type) request).IsInterface)
+            {
+                object result;
+                if (MyFactory.TryGet(request, out result))
+                    return result;
             }
 
             return new NoSpecimen(request);
@@ -90,6 +115,12 @@ namespace Ploeh.AutoFixture.Kernel
         {
             return !(value is NoSpecimen)
                 && !(value is OmitSpecimen);
+        }
+
+        private static object GetDefaultValue(ParameterInfo pi)
+        {
+            var type = pi.ParameterType;
+            return type.IsValueType ? Activator.CreateInstance(type) : null;
         }
     }
 }

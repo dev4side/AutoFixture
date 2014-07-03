@@ -22,12 +22,13 @@ namespace Ploeh.AutoFixture
         public virtual IEnumerator<ISpecimenBuilder> GetEnumerator()
         {
             yield return new StringGenerator(() => Guid.NewGuid());
+            //yield return new StringGenerator(() => " " + new Random().Next(101));
             yield return new ConstrainedStringGenerator();
             yield return new StringSeedRelay();
             yield return new RandomNumericSequenceGenerator();
             yield return new RandomCharSequenceGenerator();
-            yield return new UriGenerator();
-            yield return new UriSchemeGenerator();
+            //yield return new UriGenerator();
+            //yield return new UriSchemeGenerator();
             yield return new RangedNumberGenerator();
             yield return new RegularExpressionGenerator();
             yield return new RandomDateTimeSequenceGenerator();
@@ -35,7 +36,7 @@ namespace Ploeh.AutoFixture
             yield return new GuidGenerator();
             yield return new TypeGenerator();
             yield return new DelegateGenerator();
-            yield return new IntPtrGuard();
+            //yield return new IntPtrGuard();
         }
 
         /// <summary>
