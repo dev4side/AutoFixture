@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -252,21 +253,50 @@ namespace Ploeh.AutoFixture.Kernel
 
             foreach (var pi in this.GetProperties(specimen))
             {
-                if (pi.PropertyType.IsInterface && pi.GetValue(specimen, null) != null)
+                if (pi.PropertyType.IsInterface &&
+                    pi.GetValue(specimen, null) != null &&  // Inject check
+                    !(pi.PropertyType.IsGenericType && pi.PropertyType.GetGenericTypeDefinition() == typeof(IList<>)) )  // avoid IList no-customization
                     continue;
+
+                var oldValue = pi.GetValue(specimen, null);
                 var propertyValue = context.Resolve(pi);
                 if (!(propertyValue is OmitSpecimen))
+                {
+                    if (oldValue != null &&
+                        pi.PropertyType.IsGenericType &&
+                        pi.PropertyType.GetGenericTypeDefinition() == typeof (IList<>) && (
+                        propertyValue == null || IsEmptyList(propertyValue))) // ¿ ((IList<>) propertyValue).Count == 0 ) ?
+                    {
+                        propertyValue = oldValue;
+                    }
+
                     pi.SetValue(specimen, propertyValue, null);
+                }
+                    
             }
 
             foreach (var fi in this.GetFields(specimen))
             {
-                if (fi.FieldType.IsInterface && fi.GetValue(specimen) != null)
+                if (fi.FieldType.IsInterface && fi.GetValue(specimen) != null)  // ¿ Another check, like properties ?
                     continue;
                 var fieldValue = context.Resolve(fi);
                 if (!(fieldValue is OmitSpecimen))
                     fi.SetValue(specimen, fieldValue);
             }
         }
+
+        private static bool IsEmptyList(object paramValue)
+        {
+            try
+            {
+                return ((IList) paramValue).Count == 0;
+            }
+            catch
+            {
+                return false;
+            }
+              
+        }
+
     }
 }

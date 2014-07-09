@@ -2,10 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using AutoFixtureTests.Generator.Interfaces;
-using AutoFixtureTests.Utilities;
-using Core.Kernel;
-using Ninject.Parameters;
+using Ploeh.AutoFixture.Kernel.Utilities;
 
 namespace Ploeh.AutoFixture.Kernel
 {

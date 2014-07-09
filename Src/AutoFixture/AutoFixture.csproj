@@ -103,7 +103,9 @@
   <ItemGroup>
     <Compile Include="AutoPropertiesTarget.cs" />
     <Compile Include="BehaviorRoot.cs" />
+    <Compile Include="Kernel\Utilities\Converter.cs" />
     <Compile Include="Kernel\IRecursionHandler.cs" />
+    <Compile Include="Kernel\Utilities\MyFactory.cs" />
     <Compile Include="Kernel\OmitArrayParameterRequestRelay.cs" />
     <Compile Include="Kernel\OmitEnumerableParameterRequestRelay.cs" />
     <Compile Include="Kernel\TerminatingWithPathSpecimenBuilder.cs" />
@@ -116,6 +118,7 @@
     <Compile Include="Kernel\ThrowingRecursionHandler.cs" />
     <Compile Include="Kernel\ValueTypeSpecification.cs" />
     <Compile Include="Kernel\MutableValueTypeWarningThrower.cs" />
+    <Compile Include="MonoBooleanValueGenerator.cs" />
     <Compile Include="NoAutoPropertiesCustomization.cs" />
     <Compile Include="RandomBooleanSequenceGenerator.cs" />
     <Compile Include="CharSequenceGenerator.cs" />
@@ -165,6 +168,7 @@
     <Compile Include="Kernel\SpecimenBuilderNodeFactory.cs" />
     <Compile Include="Kernel\TypeRelay.cs" />
     <Compile Include="OmitOnRecursionBehavior.cs" />
+    <Compile Include="RandomBooleanGenerator.cs" />
     <Compile Include="RandomCharSequenceGenerator.cs" />
     <Compile Include="RandomDateTimeSequenceGenerator.cs" />
     <Compile Include="RandomBooleanSequenceCustomization.cs" />
@@ -335,12 +339,6 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Nexo\AutoFixtureTests\AutoFixtureTests.csproj">
-      <Project>{0DCE08F9-F7F6-4972-B758-93F1BBCDA543}</Project>
-      <Name>AutoFixtureTests</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
