@@ -88,9 +88,6 @@
     <CodeAnalysisRuleSet>..\AutoFixture.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Core.Kernel">
-      <HintPath>..\..\..\Nexo\scr\Core\Kernel\Core.Kernel\obj\Debug\Core.Kernel.dll</HintPath>
-    </Reference>
     <Reference Include="Ninject, Version=3.0.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
       <HintPath>..\..\..\Nexo\lib\ninject\3.0.0.15\Ninject.dll</HintPath>
     </Reference>
@@ -120,6 +117,7 @@
     <Compile Include="Kernel\MutableValueTypeWarningThrower.cs" />
     <Compile Include="MonoBooleanValueGenerator.cs" />
     <Compile Include="NoAutoPropertiesCustomization.cs" />
+    <Compile Include="NullableGenerator.cs" />
     <Compile Include="RandomBooleanSequenceGenerator.cs" />
     <Compile Include="CharSequenceGenerator.cs" />
     <Compile Include="CollectionFiller.cs" />
@@ -339,6 +337,12 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Nexo\scr\Core\Kernel\Core.Kernel\Core.Kernel.csproj">
+      <Project>{0C8747B4-FD9D-4253-A67A-BC9E79462088}</Project>
+      <Name>Core.Kernel</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -259,7 +259,8 @@ namespace Ploeh.AutoFixture.Kernel
                     continue;
 
                 var oldValue = pi.GetValue(specimen, null);
-                var propertyValue = context.Resolve(pi);
+                //var propertyValue = context.Resolve(pi);
+                var propertyValue = SafeResolve(pi, context);
                 if (!(propertyValue is OmitSpecimen))
                 {
                     if (oldValue != null &&
@@ -296,6 +297,18 @@ namespace Ploeh.AutoFixture.Kernel
                 return false;
             }
               
+        }
+
+        private static object SafeResolve(PropertyInfo pi, ISpecimenContext context)
+        {
+            try
+            {
+                return context.Resolve(pi);
+            }
+            catch
+            {
+                return null;
+            }
         }
 
     }

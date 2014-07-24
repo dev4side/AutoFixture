@@ -38,6 +38,7 @@ namespace Ploeh.AutoFixture
             yield return new GuidGenerator();
             yield return new TypeGenerator();
             yield return new DelegateGenerator();
+            yield return new NullableGenerator();
             //yield return new IntPtrGuard();
         }
 
