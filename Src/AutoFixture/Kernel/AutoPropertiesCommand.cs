@@ -255,7 +255,8 @@ namespace Ploeh.AutoFixture.Kernel
             {
                 if (pi.PropertyType.IsInterface &&
                     pi.GetValue(specimen, null) != null &&  // Inject check
-                    !(pi.PropertyType.IsGenericType && pi.PropertyType.GetGenericTypeDefinition() == typeof(IList<>)) )  // avoid IList no-customization
+                    !(pi.PropertyType.IsGenericType &&
+                    (pi.PropertyType.GetGenericTypeDefinition() == typeof(IList<>) || pi.PropertyType.GetGenericTypeDefinition() == typeof(IEnumerable<>))))  // avoid IList no-customization
                     continue;
 
                 var oldValue = pi.GetValue(specimen, null);
@@ -265,7 +266,7 @@ namespace Ploeh.AutoFixture.Kernel
                 {
                     if (oldValue != null &&
                         pi.PropertyType.IsGenericType &&
-                        pi.PropertyType.GetGenericTypeDefinition() == typeof (IList<>) && (
+                        (pi.PropertyType.GetGenericTypeDefinition() == typeof(IList<>) || pi.PropertyType.GetGenericTypeDefinition() == typeof(IEnumerable<>)) && (
                         propertyValue == null || IsEmptyList(propertyValue))) // ¿ ((IList<>) propertyValue).Count == 0 ) ?
                     {
                         propertyValue = oldValue;
