@@ -271,10 +271,9 @@ namespace Ploeh.AutoFixture.Kernel
                     {
                         propertyValue = oldValue;
                     }
-
+                    
                     pi.SetValue(specimen, propertyValue, null);
                 }
-                    
             }
 
             foreach (var fi in this.GetFields(specimen))
