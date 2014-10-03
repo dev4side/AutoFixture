@@ -394,10 +394,15 @@ namespace Ploeh.AutoFixture.Dsl
         }
 
         /// <summary>
-        /// Withouts the specified property picker.
+        /// Registers that a writable property should not be assigned an
+        /// automatic value as part of specimen post-processing.
         /// </summary>
-        /// <typeparam name="TProperty">The type of the property.</typeparam>
-        /// <param name="propertyPicker">The property picker.</param>
+        /// <typeparam name="TProperty">
+        /// The type of the property or field to ignore.
+        /// </typeparam>
+        /// <param name="propertyPicker">
+        /// An expression that identifies the property or field to be ignored.
+        /// </param>
         /// <returns>
         /// An <see cref="IPostprocessComposer{T}"/> which can be used to
         /// further customize the post-processing of created specimens.
@@ -405,13 +410,17 @@ namespace Ploeh.AutoFixture.Dsl
         public IPostprocessComposer<T> Without<TProperty>(
             Expression<Func<T, TProperty>> propertyPicker)
         {
+            var m = propertyPicker.GetWritableMember().Member;
+            if (m.ReflectedType != typeof(T))
+                m = typeof(T).GetProperty(m.Name);
+
             return (NodeComposer<T>)this.ReplaceNodes(
                 with: n => n.Compose(
                     new[]
                     {
                         new Omitter(
                             new EqualRequestSpecification(
-                                propertyPicker.GetWritableMember().Member,
+                                m,
                                 new MemberInfoEqualityComparer()))
                     }.Concat(n)),
                 when: n => n is NodeComposer<T>);

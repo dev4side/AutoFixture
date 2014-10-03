@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
+using Grean.Exude;
+using Ploeh.Albedo;
 using Ploeh.AutoFixture;
 using Ploeh.AutoFixture.Dsl;
 using Ploeh.AutoFixture.Kernel;
@@ -236,7 +240,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void CreateAnonymousCompatibilityExtensionWillCreateSimpleObject()
         {
             // Fixture setup
@@ -300,8 +305,14 @@ namespace Ploeh.AutoFixtureUnitTest
                 .Select(threadNumber => Enumerable
                     .Range(0, specimenCountPerThread)
                     .Select(_ => sut.Create<SpecimenWithEverything>())
-                    .Select(s => new { Specimen = s, threadNumber,
-                        ValuesNotPopulated = ValueCollectingVisitor.GetAllInstanceValues(s)
+                    .Select(s => new
+                    {
+                        Specimen = s,
+                        threadNumber,
+                        ValuesNotPopulated = s.GetType()
+                            .GetPropertiesAndFields(BindingFlags.Public | BindingFlags.Instance)
+                            .Accept(new ValueCollectingVisitor(s))
+                            .Value
                             .Where(v => v == null || 0.Equals(v))
                             .ToArray()
                     })
@@ -310,11 +321,11 @@ namespace Ploeh.AutoFixtureUnitTest
 
             // Verify outcome
             Assert.Equal(specimenCountPerThread * threadCount, specimensByThread.Sum(t => t.Length));
-            
+
             var allValuesNotPopulated = specimensByThread
                 .SelectMany(t => t.SelectMany(s => s.ValuesNotPopulated));
 
-            Assert.False(allValuesNotPopulated.Any());
+            Assert.Empty(allValuesNotPopulated);
 
             // Teardown
         }
@@ -1407,6 +1418,18 @@ namespace Ploeh.AutoFixtureUnitTest
 
         [Fact]
         [UseCulture("en-US")]
+        public void CreateAnonymousWithRangeValidatedShortPropertyReturnsCorrectResultForIntegerRange()
+        {
+            // Fixture setup
+            var fixture = new Fixture();
+            var result = fixture.Create<RangeValidatedType>();
+            // Verify outcome
+            Assert.True(result.Property7 >= RangeValidatedType.Minimum && result.Property7 <= RangeValidatedType.Maximum);
+            // Teardown
+        }
+
+        [Fact]
+        [UseCulture("en-US")]
         public void CreateAnonymousWithRangeValidatedDoublePropertyReturnsCorrectResultForDoubleWithMinimumDoubleMinValue()
         {
             // Fixture setup
@@ -1555,6 +1578,21 @@ namespace Ploeh.AutoFixtureUnitTest
             var fixture = new Fixture();
             // Exercise system
             var result = (from n in Enumerable.Range(1, 33).Select(i => fixture.Create<RangeValidatedType>().Property6)
+                          where (n < RangeValidatedType.Minimum && n > RangeValidatedType.Maximum)
+                          select n);
+            // Verify outcome
+            Assert.False(result.Any());
+            // Teardown
+        }
+
+        [Fact]
+        [UseCulture("en-US")]
+        public void CreateAnonymousWithRangeValidatedShortPropertyReturnsCorrectResultForIntegerRangeOnMultipleCall()
+        {
+            // Fixture setup
+            var fixture = new Fixture();
+            // Exercise system
+            var result = (from n in Enumerable.Range(1, 33).Select(i => fixture.Create<RangeValidatedType>().Property7)
                           where (n < RangeValidatedType.Minimum && n > RangeValidatedType.Maximum)
                           select n);
             // Verify outcome
@@ -2568,7 +2606,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void FromFactoryWithOneParameterWillRespectPreviousCustomizationsObsolete()
         {
             // Fixture setup
@@ -2600,7 +2639,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void FromFactoryWithTwoParametersWillRespectPreviousCustomizationsObsolete()
         {
             // Fixture setup
@@ -2632,7 +2672,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void FromFactoryWithThreeParametersWillRespectPreviousCustomizationsObsolete()
         {
             // Fixture setup
@@ -2664,7 +2705,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void FromFactoryWithFourParametersWillRespectPreviousCustomizationsObsolete()
         {
             // Fixture setup
@@ -2902,7 +2944,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void OmitAutoPropertiesFollowedByOptInWillNotSetOtherPropertiesObsolete()
         {
             // Fixture setup
@@ -2932,7 +2975,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void OmitAutoPropertiesFollowedByTwoOptInsWillNotSetAnyOtherPropertiesObsolete()
         {
             // Fixture setup
@@ -2968,7 +3012,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void WithTwoOptInsFollowedByOmitAutoPropertiesWillNotSetAnyOtherPropertiesObsolete()
         {
             // Fixture setup
@@ -3054,7 +3099,8 @@ namespace Ploeh.AutoFixtureUnitTest
                 ).Create<RecursionTestObjectWithReferenceOutA>());
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildWithThrowingRecursionHandlerWillThrowOnConstructorRecursionPointObsolete()
         {
             // Fixture setup
@@ -3083,7 +3129,8 @@ namespace Ploeh.AutoFixtureUnitTest
                 ).Create<RecursionTestObjectWithConstructorReferenceOutA>());
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildWithNullRecursionHandlerWillCreateNullOnRecursionPointObsolete()
         {
             // Fixture setup
@@ -3224,7 +3271,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void CustomizeInstanceWithOmitAutoPropertiesWillReturnFactoryWithOmitAutoPropertiesObsolete()
         {
             // Fixture setup
@@ -3311,7 +3359,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildFromSeedWillReturnCorrectResultObsolete()
         {
             // Fixture setup
@@ -3353,7 +3402,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildAndCreateAnonymousWillSetInt32Property()
         {
             // Fixture setup
@@ -3379,7 +3429,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildAndCreateAnonymousWillSetInt32Field()
         {
             // Fixture setup
@@ -3405,7 +3456,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildAndCreateAnonymousWillNotAttemptToSetReadOnlyProperty()
         {
             // Fixture setup
@@ -3431,7 +3483,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildAndCreateAnonymousWillNotAttemptToSetReadOnlyField()
         {
             // Fixture setup
@@ -3457,7 +3510,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildWithWillSetPropertyOnCreatedObjectObsolete()
         {
             // Fixture setup
@@ -3483,7 +3537,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildWithWillSetFieldOnCreatedObjectObsolete()
         {
             // Fixture setup
@@ -3509,7 +3564,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildAnonymousWithWillAssignPropertyEvenInCombinationWithOmitAutoPropertiesObsolete()
         {
             // Fixture setup
@@ -3535,7 +3591,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildAnonymousWithWillAssignFieldEvenInCombinationWithOmitAutoProperties()
         {
             // Fixture setup
@@ -3561,7 +3618,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildWithoutWillIgnorePropertyOnCreatedObjectObsolete()
         {
             // Fixture setup
@@ -3585,7 +3643,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildWithoutWillIgnorePropertyOnCreatedObjectEvenInCombinationWithWithAutoPropertiesObsolete()
         {
             // Fixture setup
@@ -3609,7 +3668,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildWithoutWillIgnoreFieldOnCreatedObjectObsolete()
         {
             // Fixture setup
@@ -3633,7 +3693,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildWithoutWillNotIgnoreOtherPropertyOnCreatedObjectObsolete()
         {
             // Fixture setup
@@ -3657,7 +3718,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildWithoutWillNotIgnoreOtherFieldOnCreatedObjectObsolete()
         {
             // Fixture setup
@@ -3681,7 +3743,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildAndOmitAutoPropertiesWillNotAutoPopulatePropertyObsolete()
         {
             // Fixture setup
@@ -3705,7 +3768,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildWithAutoPropertiesWillAutoPopulatePropertyObsolete()
         {
             // Fixture setup
@@ -3729,7 +3793,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildAndDoWillPerformOperationOnCreatedObjectObsolete()
         {
             // Fixture setup
@@ -3755,7 +3820,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuilderSequenceWillBePreservedObsolete()
         {
             // Fixture setup
@@ -3790,7 +3856,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildAndCreateAnonymousWillInvokeResidueCollector()
         {
             // Fixture setup
@@ -3834,7 +3901,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildAndCreateAnonymousOnUnregisteredAbstractionWillInvokeResidueCollectorWithCorrectType()
         {
             // Fixture setup
@@ -3872,7 +3940,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildAndCreateAnonymousOnUnregisteredAbstractionWillReturnInstanceFromResidueCollector()
         {
             // Fixture setup
@@ -3908,7 +3977,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildAndOmitAutoPropetiesWillNotMutateSutObsolete()
         {
             // Fixture setup
@@ -3936,7 +4006,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildWithAutoPropetiesWillNotMutateSutObsolete()
         {
             // Fixture setup
@@ -3964,7 +4035,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildAnonymousWithWillNotMutateSut()
         {
             // Fixture setup
@@ -3992,7 +4064,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildAnonymousWithUnexpectedWillNotMutateSut()
         {
             // Fixture setup
@@ -4022,7 +4095,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildWithoutWillNotMutateSutObsolete()
         {
             // Fixture setup
@@ -4050,7 +4124,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildAndCreateAnonymousWillReturnCreatedObject()
         {
             // Fixture setup
@@ -4145,7 +4220,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildAndCreateAnonymousWillCreateObject()
         {
             // Fixture setup
@@ -4169,7 +4245,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildAndCreateAnonymousAfterDefiningConstructorWithZeroParametersWillReturnDefinedObject()
         {
             // Fixture setup
@@ -4199,7 +4276,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildAndCreateAnonymousAfterDefiningConstructorWithOneParameterWillReturnDefinedObject()
         {
             // Fixture setup
@@ -4229,7 +4307,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildAndCreateAnonymousAfterDefiningConstructorWithTwoParametersWillReturnDefinedObject()
         {
             // Fixture setup
@@ -4259,7 +4338,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildAndCreateAnonymousAfterDefiningConstructorWithThreeParametersWillReturnDefinedObject()
         {
             // Fixture setup
@@ -4289,7 +4369,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildAndCreateAnonymousAfterDefiningConstructorWithFourParametersWillReturnDefinedObject()
         {
             // Fixture setup
@@ -4319,7 +4400,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildFromFactoryStillAppliesAutoPropertiesObsolete()
         {
             // Fixture setup
@@ -4347,7 +4429,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildOverwritesPreviousFactoryBasedCustomizationObsolete()
         {
             // Fixture setup
@@ -4407,7 +4490,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildAbstractClassThrowsObsolete()
         {
             // Fixture setup
@@ -4429,7 +4513,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildAbstractTypeUsingStronglyTypedFactoryIsPossibleObsolete()
         {
             // Fixture setup
@@ -4453,7 +4538,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildAbstractTypeUsingBuilderIsPossibleObsolete()
         {
             // Fixture setup
@@ -4480,7 +4566,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildAbstractTypeCorrectlyAppliesPropertyObsolete()
         {
             // Fixture setup
@@ -4512,7 +4599,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void RegisterNullWillAssignCorrectPickedPropertyValueObsolete()
         {
             // Fixture setup
@@ -4628,7 +4716,8 @@ namespace Ploeh.AutoFixtureUnitTest
             // Teardown
         }
 
-        [Fact][Obsolete]
+        [Fact]
+        [Obsolete]
         public void BuildWithOverriddenVirtualPropertyCorrectlySetsPropertyObsolete()
         {
             // Fixture setup
@@ -5047,7 +5136,7 @@ namespace Ploeh.AutoFixtureUnitTest
         public void CustomizingEnumerableCustomizedCreateManyWhenCreateManyIsMappedToEnumerable()
         {
             // Fixture setup
-            var fixture = 
+            var fixture =
                 new Fixture().Customize(new MapCreateManyToEnumerable());
             var expected = new[] { "a", "b", "c", "d" };
             fixture.Register<IEnumerable<string>>(() => expected);
@@ -5321,6 +5410,36 @@ namespace Ploeh.AutoFixtureUnitTest
             }
         }
 
+        [Fact]
+        public void CustomizationOfChildADoesNotAffectChildB()
+        {
+            // Fixture setup
+            var fixture = new Fixture();
+            fixture.Customize<AcwaacpChildA>(c => c.Without(x => x.Value));
+            // Exercise system
+            var actual = fixture.Create<AcwaacpChildB>();
+            // Verify outcome
+            Assert.NotEqual(default(int), actual.Value);
+            // Teardown
+        }
+
+        private abstract class AbstractClassWithAbstractAndConcreteProperties
+        {
+            public string Text { get; set; }
+
+            public abstract int Value { get; set; }
+        }
+
+        private class AcwaacpChildA : AbstractClassWithAbstractAndConcreteProperties
+        {
+            public override int Value { get; set; }
+        }
+
+        private class AcwaacpChildB : AbstractClassWithAbstractAndConcreteProperties
+        {
+            public override int Value { get; set; }
+        }
+
         private class RecursionTestObjectWithReferenceOutA
         {
             public RecursionTestObjectWithReferenceOutB ReferenceToB
@@ -5365,6 +5484,83 @@ namespace Ploeh.AutoFixtureUnitTest
             {
                 this.ReferenceToA = a;
             }
+        }
+
+        [FirstClassTests]
+        public IEnumerable<ITestCase> CreateComplexArrayTypeReturnsCorrectResult()
+        {
+            var requests = new[]
+            {
+                typeof(string[][,,][]),
+                typeof(object[,,][][,])
+            };
+            return requests.Select(r => new TestCase(() =>
+            {
+                var sut = new Fixture();
+                var context = new SpecimenContext(sut);
+                Assert.NotNull(context.Resolve(r));
+            }));
+        }
+
+        [Theory]
+        [InlineData(1)]
+        [InlineData(2)]
+        [InlineData(3)]
+        [InlineData(10)]
+        public void CreateComplexArrayTypeReturnsArrayReflectingCorrectRepeatCount(int repeatCount)
+        {
+            var sut = new Fixture{ RepeatCount = repeatCount };
+            
+            var actual = sut.Create<int[,][]>();
+
+            Assert.Equal(repeatCount, actual.GetLength(0));
+            Assert.Equal(repeatCount, actual.GetLength(1));
+            Assert.Equal(repeatCount, actual[0, 0].Length);
+        }
+
+        [Fact]
+        public void CreateNonGenericTaskReturnsAwaitableTask()
+        {
+            // Fixture setup
+            Fixture sut = new Fixture();
+            // Exercise system
+            Task result = sut.Create<Task>();
+            // Verify outcome
+            Thread thread = new Thread(result.Wait);
+            thread.Start();
+            bool ranToCompletion = thread.Join(1000);
+
+            Assert.True(ranToCompletion);
+            // Teardown
+        }
+
+        [Fact]
+        public void CreateGenericTaskReturnsAwaitableTask()
+        {
+            // Fixture setup
+            Fixture sut = new Fixture();
+            // Exercise system
+            Task<int> result = sut.Create<Task<int>>();
+            // Verify outcome
+            Thread thread = new Thread(result.Wait);
+            thread.Start();
+            bool ranToCompletion = thread.Join(1000);
+
+            Assert.True(ranToCompletion);
+            // Teardown
+        }
+
+        [Fact]
+        public void CreateGenericTaskReturnsTaskWhoseResultWasResolvedByFixture()
+        {
+            // Fixture setup
+            Fixture sut = new Fixture();
+            int frozenInt = sut.Freeze<int>();
+            // Exercise system
+            Task<int> result = sut.Create<Task<int>>();
+            // Verify outcome
+            Assert.Equal(frozenInt, result.Result);
+            // Teardown
         }
     }
 }

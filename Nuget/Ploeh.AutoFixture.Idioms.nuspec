@@ -8,7 +8,7 @@
         <owners>Mark Seemann</owners>
         <dependencies>
             <dependency id="autofixture" version="2.2" />
-            <dependency id="Albedo" version="0.1.1" />
+            <dependency id="Albedo" version="1.0.1" />
         </dependencies>
         <summary>Extension to AutoFixture that contains unit testing idioms.</summary>
         <description>Ubiquitous use of AutoFixture for unit testing has given rise to a number of idiomatic unit tests - unit tests that tend to follow common templates. The AutoFixture Idioms library encapsulates these idioms into reusable classes and methods.</description>
@@ -19,6 +19,9 @@
     </metadata>
     <files>
         <file src="Ploeh.AutoFixture.Idioms.dll" target="lib\net40" />
+        <file src="Ploeh.AutoFixture.Idioms.pdb" target="lib\net40" />
         <file src="Ploeh.AutoFixture.Idioms.XML" target="lib\net40" />
+        <file src="..\Src\Idioms\**\*.cs" target="src" />
+        <file src="Install.ps1" target="tools" />
     </files>
 </package>

@@ -75,8 +75,9 @@
     <CodeAnalysisRuleSet>..\AutoFixture.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Ploeh.Albedo">
-      <HintPath>..\..\Packages\Albedo.0.1.1\lib\net35\Ploeh.Albedo.dll</HintPath>
+    <Reference Include="Ploeh.Albedo, Version=1.0.1.0, Culture=neutral, PublicKeyToken=179ef6dd03497bbd, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Packages\Albedo.1.0.1\lib\net35\Ploeh.Albedo.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -90,6 +91,8 @@
     <Compile Include="EqualsOverrideException.cs" />
     <Compile Include="CompositeBehaviorExpectation.cs" />
     <Compile Include="EmptyGuidBehaviorExpectation.cs" />
+    <Compile Include="GetHashCodeOverrideException.cs" />
+    <Compile Include="GetHashCodeSuccessiveAssertion.cs" />
     <Compile Include="IExpansion.cs" />
     <Compile Include="IndexedReplacement.cs" />
     <Compile Include="MethodInfoExtensions.cs" />

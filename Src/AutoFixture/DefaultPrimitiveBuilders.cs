@@ -27,8 +27,8 @@ namespace Ploeh.AutoFixture
             yield return new StringSeedRelay();
             yield return new RandomNumericSequenceGenerator();
             yield return new RandomCharSequenceGenerator();
-            //yield return new UriGenerator();
-            //yield return new UriSchemeGenerator();
+            yield return new UriGenerator();
+            yield return new UriSchemeGenerator();
             yield return new RangedNumberGenerator();
             yield return new RegularExpressionGenerator();
             yield return new RandomDateTimeSequenceGenerator();
@@ -38,8 +38,9 @@ namespace Ploeh.AutoFixture
             yield return new GuidGenerator();
             yield return new TypeGenerator();
             yield return new DelegateGenerator();
+            yield return new IntPtrGuard();
+            yield return new TaskGenerator();
             yield return new NullableGenerator();
-            //yield return new IntPtrGuard();
         }
 
         /// <summary>
